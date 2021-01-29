@@ -36,6 +36,8 @@ char amxFile[256];
 AMX m_amx;
 std::string token;
 std::string script;
+bool logForOwner;
+int32_t botOwner = 0;
 int64_t S64(const char* s) {
 	int64_t i;
 	char c;
@@ -64,6 +66,12 @@ int longPollThread(TgBot::Bot bot)
 		bot.getApi().getUpdates(longPoll.WtfIsLastOne());
 		bot.getApi().getUpdates(longPoll.WtfIsLastOne() + 1);
 		logprintf((char*)"Error: %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
 		logprintf((char*)"[%s] : AMX Exiting", amxFile);
 		int tmp;
 		if (!amx_FindPublic(&m_amx, "OnExit", &tmp))
@@ -88,6 +96,12 @@ void sendvideo(AMX* amx, cell* params)
 	catch (TgBot::TgException& e)
 	{
 		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
 	}
 }
 void sendmessage(AMX* amx, cell* params)
@@ -104,6 +118,13 @@ void sendmessage(AMX* amx, cell* params)
 	catch (TgBot::TgException& e)
 	{
 		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
+
 	}
 }
 void sendphoto(AMX* amx, cell* params)
@@ -123,9 +144,15 @@ void sendphoto(AMX* amx, cell* params)
 	catch (TgBot::TgException& e)
 	{
 		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
+
 	}
 }
-
 
 static cell AMX_NATIVE_CALL n_print(AMX* amx, cell* params)
 {
@@ -268,7 +295,7 @@ static cell AMX_NATIVE_CALL n_ClearConsole(AMX* amx, cell* params)
 #endif  //finish
 	return 0;
 }
-int32_t botOwner = 0;
+
 static cell AMX_NATIVE_CALL n_SetOwner(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(1);
@@ -362,6 +389,7 @@ int main()
     INIReader reader("config.cfg");
 	token = reader.Get("bot", "token", "null");
 	script = reader.Get("script", "amx", "test");
+	logForOwner = reader.GetBoolean("bot", "logForOwner", false);
 	script = script + ".amx";
 	logprintf((char*)OBFUSCATE("[Telegram-Pawn] : Script : %s"), script.c_str());
 	TgBot::Bot bot = TgBot::Bot(token);

@@ -75,5 +75,16 @@ CMD:hi(chatId[], fromId[], messageId[], forwardFromMessageId[], forwardFromId[],
 | fileSize | int  | size of the file  | 
 | isAnimated | bool  | is the sticker animated  | 
 
+## Logging system :
+If you want to get errors in Telegram you should change logForOwner in config.cfg file.
+Note : You should set id of the owner of the robot in your script using SetOwner
+```cpp
+public OnInit()
+{
+	SetOwner(id);//id = Id of a user, not a group/supergroup, not a channel
+	return 1;
+}
+```
+
 ## Licence
 [The MIT License](https://github.com/NimaBastani/Telegram-Pawn/blob/main/LICENSE).
