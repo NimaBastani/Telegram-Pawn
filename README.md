@@ -58,20 +58,22 @@ CMD:hi(chatId[], fromId[], messageId[], forwardFromMessageId[], forwardFromId[],
 | OnVideoSend | This callback is triggered when send a (video)  | OnVideoSend(chatId[], fromId[], messageId[], forwardFromMessageId[], forwardFromId[], duration, fileSize, fileId[], caption[])) |
 | OnStickerSend | This callback is triggered when send a (sticker)  | OnStickerSend(chatId[], fromId[], messageId[], forwardFromMessageId[], forwardFromId[], isAnimated, height, width, setName[], fileId[]) |
 
+
 | --- | Type | Description | 
-| chatId | string  | Id of the channel/group/user |
-| fromId | string  | Id of the user who send the message  |
-| messageId | string  | Id of the message  |
-| forwardFromMessageId | string  | If the message is not forwarded it will be "-1", id of the forwarded message  |
-| forwardFromId | string  | If the message is not forwarded it will be "-1", id of the forwarded chat  |
-| fileId | string  | Id of the file  |
-| caption | string  | caption of the message (Image/Video/Audio)  |
-| setName | string  | Name of the sticker set  |
-| duration | int  | duration of the video/audio  |
-| height | int  | height of the video/sticker/video  |
-| width | int  | width of the video/sticker/video  |
-| fileSize | int  | size of the file  |
-| isAnimated | bool  | is the sticker animated  |
+| --- | --- | --- |
+| chatId | string  | Id of the channel/group/user | 
+| fromId | string  | Id of the user who send the message  | 
+| messageId | string  | Id of the message  | 
+| forwardFromMessageId | string  | If the message is not forwarded it will be "-1", id of the forwarded message  | 
+| forwardFromId | string  | If the message is not forwarded it will be "-1", id of the forwarded chat  | 
+| fileId | string  | Id of the file  | 
+| caption | string  | caption of the message (Image/Video/Audio)  | 
+| setName | string  | Name of the sticker set  | 
+| duration | int  | duration of the video/audio  | 
+| height | int  | height of the video/sticker/video  | 
+| width | int  | width of the video/sticker/video  | 
+| fileSize | int  | size of the file  | 
+| isAnimated | bool  | is the sticker animated  | 
 
 ## Licence
 [The MIT License](https://github.com/NimaBastani/Telegram-Pawn/blob/main/LICENSE).
