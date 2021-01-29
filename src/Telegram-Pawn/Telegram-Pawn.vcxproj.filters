@@ -1,0 +1,141 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="INIReader">
+      <UniqueIdentifier>{dec5d283-5451-44e7-a2a7-c612d6390f1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="amx">
+      <UniqueIdentifier>{85f0d89b-d657-4243-b9f2-7037bcd74c5d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="format">
+      <UniqueIdentifier>{04da50ff-2e83-4ae7-ad1d-d96c619e021f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tgbot">
+      <UniqueIdentifier>{2e087b30-cf49-4b4d-8e74-96cd73a80c15}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="obfuscator">
+      <UniqueIdentifier>{83e773f8-39d2-4f62-8e23-29fe4c93e513}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Telegram-Pawn.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amx.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxcons.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxcore.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxDGram.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxfile.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxfloat.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxstring.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\amxtime.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="amx\prefix.c">
+      <Filter>amx</Filter>
+    </ClCompile>
+    <ClCompile Include="format.cpp">
+      <Filter>format</Filter>
+    </ClCompile>
+    <ClCompile Include="amx_script.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\Api.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\EventHandler.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\TgException.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\TgTypeParser.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\net\BoostHttpOnlySslClient.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\net\CurlHttpClient.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\net\HttpParser.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\net\TgLongPoll.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\net\Url.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\tools\FileTools.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\tools\StringTools.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\types\InlineQueryResult.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="tgbot\types\InputFile.cpp">
+      <Filter>tgbot</Filter>
+    </ClCompile>
+    <ClCompile Include="test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="INIReader\INIReader.h">
+      <Filter>INIReader</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\amx.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\osdefs.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\prefix.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="amx\sclinux.h">
+      <Filter>amx</Filter>
+    </ClInclude>
+    <ClInclude Include="format.h">
+      <Filter>format</Filter>
+    </ClInclude>
+    <ClInclude Include="meta_random.hpp">
+      <Filter>obfuscator</Filter>
+    </ClInclude>
+    <ClInclude Include="obfuscator.hpp">
+      <Filter>obfuscator</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+</Project>
