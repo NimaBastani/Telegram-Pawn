@@ -11,6 +11,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 #include "amx/amx.h"
+
 bool LoadScript(char* pFileName);
 extern "C" int amx_CoreInit(AMX * amx);
 extern "C" int amx_CoreCleanup(AMX * amx);
@@ -48,6 +49,84 @@ int64_t S64(const char* s) {
 	return 0;
 }
 #define CHECK_PARAMS(n) { if (params[0] != (n * sizeof(cell))) { logprintf((char*)"[%s] : Bad parameter count (count is %d, should be %d): ", amxFile, params[0] / sizeof(cell), n); return 0; } }
+int longPollThread(TgBot::Bot bot)
+{
+	TgBot::TgLongPoll longPoll(bot);
+	try {
+		logprintf((char*)"Bot username: %s", bot.getApi().getMe()->username.c_str());
+		bot.getApi().deleteWebhook();
+		//bot.getApi().leaveChat(-1001181793654);
+		while (true) {
+			longPoll.start();
+		}
+	}
+	catch (TgBot::TgException& e) {
+		bot.getApi().getUpdates(longPoll.WtfIsLastOne());
+		bot.getApi().getUpdates(longPoll.WtfIsLastOne() + 1);
+		logprintf((char*)"Error: %s", e.what());
+		logprintf((char*)"[%s] : AMX Exiting", amxFile);
+		int tmp;
+		if (!amx_FindPublic(&m_amx, "OnExit", &tmp))
+			amx_Exec(&m_amx, (cell*)&tmp, tmp);
+		aux_FreeProgram(&m_amx);
+		return 0;
+	}
+}
+void sendvideo(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		amx_StrParam(amx, params[1], szId);
+		char* szURL;
+		char* szCaption;
+		amx_StrParam(amx, params[2], szURL);
+		amx_StrParam(amx, params[7], szCaption);
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().sendVideo(S64(szId), szURL, params[3], params[4], params[5], params[6], "", szCaption, params[8]);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+	}
+}
+void sendmessage(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		amx_StrParam(amx, params[1], szId);
+		char* szText;
+		amx_StrParam(amx, params[2], szText);
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().sendMessage(S64(szId), szText, (bool)params[3], params[4]);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+	}
+}
+void sendphoto(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		amx_StrParam(amx, params[1], szId);
+		char* szURL;
+		char* szCaption;
+		amx_StrParam(amx, params[2], szURL);
+		amx_StrParam(amx, params[3], szCaption);
+
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().sendPhoto(S64(szId), szURL, szCaption, params[4]);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+	}
+}
+
+
 static cell AMX_NATIVE_CALL n_print(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(1);
@@ -76,36 +155,21 @@ static cell AMX_NATIVE_CALL n_RegisterCommand(AMX* amx, cell* params)
 }
 static cell AMX_NATIVE_CALL n_SendMessage(AMX* amx, cell* params)
 {
-	char* szId;
-	amx_StrParam(amx, params[1], szId);
-	char* szText;
-	amx_StrParam(amx, params[2], szText);
-	TgBot::Bot bot = TgBot::Bot(token);
-	bot.getApi().sendMessage(S64(szId), szText, (bool)params[3], params[4]);
+	std::thread what_thread_is_this(sendmessage, amx, params);
+	what_thread_is_this.join();
 	return 0;
 }
+
 static cell AMX_NATIVE_CALL n_SendPhoto(AMX* amx, cell* params)
 {
-	char* szId;
-	amx_StrParam(amx, params[1], szId);
-	char* szURL;
-	char* szCaption;
-	amx_StrParam(amx, params[2], szURL);
-	amx_StrParam(amx, params[3], szCaption);
-	TgBot::Bot bot = TgBot::Bot(token);
-	bot.getApi().sendPhoto(S64(szId), szURL, szCaption, params[4]);
+	std::thread what_thread_is_this(sendphoto, amx, params);
+	what_thread_is_this.join();
 	return 0;
 }
 static cell AMX_NATIVE_CALL n_SendVideo(AMX* amx, cell* params)
 {
-	char* szId;
-	amx_StrParam(amx, params[1], szId);
-	char* szURL;
-	char* szCaption;
-	amx_StrParam(amx, params[2], szURL);
-	amx_StrParam(amx, params[7], szCaption);
-	TgBot::Bot bot = TgBot::Bot(token);
-	bot.getApi().sendVideo(S64(szId), szURL, params[3], params[4], params[5], params[6], "", szCaption, params[8]);
+	std::thread what_thread_is_this(sendvideo, amx, params);
+	what_thread_is_this.join();
 	return 0;
 }
 static cell AMX_NATIVE_CALL n_format(AMX* amx, cell* params)
@@ -430,53 +494,39 @@ int main()
 	bot.getEvents().onUnknownCommand([&bot](TgBot::Message::Ptr message) {
 		int idx;
 		cell ret = 1;	// DEFAULT TO 1!
-		int orig_strlen = strlen((char*)message->text.c_str()) + 1;
-		if (!amx_FindPublic(&m_amx, "OnCommand", &idx))
+		if (message->text.length() < 120)
 		{
-			cell amx_addr, * phys_addr;
-			amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)message->text.c_str(), 0, 0);
-			if (message->forwardFrom)
+			int orig_strlen = strlen((char*)message->text.c_str()) + 1;
+			if (!amx_FindPublic(&m_amx, "OnCommand", &idx))
 			{
-				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->forwardFrom->id).c_str(), 0, 0);
-				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->forwardFromMessageId).c_str(), 0, 0);
+				cell amx_addr, * phys_addr;
+				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)message->text.c_str(), 0, 0);
+				if (message->forwardFrom)
+				{
+					amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->forwardFrom->id).c_str(), 0, 0);
+					amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->forwardFromMessageId).c_str(), 0, 0);
+				}
+				else
+				{
+					amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(-1).c_str(), 0, 0);
+					amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(-1).c_str(), 0, 0);
+				}
+				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->messageId).c_str(), 0, 0);
+				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->from->id).c_str(), 0, 0);
+				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->chat->id).c_str(), 0, 0);
+				amx_Exec(&m_amx, &ret, idx);
+				amx_GetString((char*)message->text.c_str(), phys_addr, 0, orig_strlen);
+				amx_Release(&m_amx, amx_addr);
 			}
-			else
-			{
-				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(-1).c_str(), 0, 0);
-				amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(-1).c_str(), 0, 0);
-			}
-			amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->messageId).c_str(), 0, 0);
-			amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->from->id).c_str(), 0, 0);
-			amx_PushString(&m_amx, &amx_addr, &phys_addr, (char*)std::to_string(message->chat->id).c_str(), 0, 0);
-			amx_Exec(&m_amx, &ret, idx);
-			amx_GetString((char*)message->text.c_str(), phys_addr, 0, orig_strlen);
-			amx_Release(&m_amx, amx_addr);
 		}
 	});
-
 	signal(SIGINT, [](int s) {
 		printf("SIGINT got\n");
 		exit(0);
 		});
-	try {
-		logprintf((char*)"Bot username: %s", bot.getApi().getMe()->username.c_str());
-		bot.getApi().deleteWebhook();
-		TgBot::TgLongPoll longPoll(bot);
-		while (true) {
-			longPoll.start();
-		}
-	}
-	catch (TgBot::TgException& e) {
-		bot.getApi().getUpdates();
-		logprintf((char*)"Error: %s", e.what());
-		logprintf((char*)"[%s] : AMX Exiting", amxFile);
-		int tmp;
-		if (!amx_FindPublic(&m_amx, "OnExit", &tmp))
-			amx_Exec(&m_amx, (cell*)&tmp, tmp);
-		aux_FreeProgram(&m_amx);
-		//return main();
-	}
-	bot.getApi().getUpdates().clear();
+
+	std::thread what_thread_is_this(longPollThread, bot);
+	what_thread_is_this.join();
 	return 0;
 }
 bool LoadScript(char* pFileName)

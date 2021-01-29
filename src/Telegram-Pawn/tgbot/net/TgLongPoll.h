@@ -19,7 +19,10 @@ class TGBOT_API TgLongPoll {
 public:
     TgLongPoll(const Api* api, const EventHandler* eventHandler, std::int32_t, std::int32_t, const std::shared_ptr<std::vector<std::string>>&);
     TgLongPoll(const Bot& bot, std::int32_t = 100, std::int32_t = 10, const std::shared_ptr<std::vector<std::string>>& = nullptr);
-
+    std::int32_t WtfIsLastOne()
+    {
+        return _lastUpdateId;
+    }
     /**
      * @brief Starts long poll. After new update will come, this method will parse it and send to EventHandler which invokes your listeners. Designed to be executed in a loop.
      */
