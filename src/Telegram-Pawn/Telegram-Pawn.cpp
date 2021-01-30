@@ -154,6 +154,84 @@ void sendphoto(AMX* amx, cell* params)
 	}
 }
 
+void forwardMessage(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		char* szFromChatId;
+		char* messageId;
+		amx_StrParam(amx, params[1], szId);
+		amx_StrParam(amx, params[2], szFromChatId);
+		amx_StrParam(amx, params[3], messageId);
+
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().forwardMessage(S64(szId), S64(szFromChatId), S64(messageId), (bool)params[4]);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
+
+	}
+}
+
+void sendChatAction(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		char* szAction;
+		amx_StrParam(amx, params[1], szId);
+		amx_StrParam(amx, params[2], szAction);
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().sendChatAction(S64(szId), szAction);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
+	}
+}
+
+void sendAudio(AMX* amx, cell* params)
+{
+	try
+	{
+		char* szId;
+		amx_StrParam(amx, params[1], szId);
+		char* szURL;
+		char* szCaption;
+		char* szPerformer;
+		char* szTitle;
+		amx_StrParam(amx, params[2], szURL);
+		amx_StrParam(amx, params[3], szCaption);
+		amx_StrParam(amx, params[5], szPerformer);
+		amx_StrParam(amx, params[6], szTitle);
+		TgBot::Bot bot = TgBot::Bot(token);
+		bot.getApi().sendAudio(S64(szId), szURL, szCaption, params[4], szPerformer, szTitle, "", params[7]);
+	}
+	catch (TgBot::TgException& e)
+	{
+		logprintf((char*)"Ops, Error : %s", e.what());
+		if (logForOwner)
+		{
+			TgBot::Bot bot = TgBot::Bot(token);
+			try { bot.getApi().sendMessage(botOwner, e.what()); }
+			catch (TgBot::TgException& e) {}
+		}
+	}
+}
 static cell AMX_NATIVE_CALL n_print(AMX* amx, cell* params)
 {
 	CHECK_PARAMS(1);
@@ -193,12 +271,32 @@ static cell AMX_NATIVE_CALL n_SendPhoto(AMX* amx, cell* params)
 	what_thread_is_this.join();
 	return 0;
 }
+
+static cell AMX_NATIVE_CALL n_ForwardMessage(AMX* amx, cell* params)
+{
+	std::thread what_thread_is_this(forwardMessage, amx, params);
+	what_thread_is_this.join();
+	return 0;
+}
 static cell AMX_NATIVE_CALL n_SendVideo(AMX* amx, cell* params)
 {
 	std::thread what_thread_is_this(sendvideo, amx, params);
 	what_thread_is_this.join();
 	return 0;
 }
+static cell AMX_NATIVE_CALL n_SendAudio(AMX* amx, cell* params)
+{
+	std::thread what_thread_is_this(sendAudio, amx, params);
+	what_thread_is_this.join();
+	return 0;
+}
+static cell AMX_NATIVE_CALL n_SendChatAction(AMX* amx, cell* params)
+{
+	std::thread what_thread_is_this(sendChatAction, amx, params);
+	what_thread_is_this.join();
+	return 0;
+}
+
 static cell AMX_NATIVE_CALL n_format(AMX* amx, cell* params)
 {
 	int len;
@@ -322,6 +420,10 @@ AMX_NATIVE_INFO tp_Natives[] =
 	{ "SendMessage",		n_SendMessage },
 	{ "SendPhoto",			n_SendPhoto },
 	{ "SendVideo",			n_SendVideo },
+	{ "SendAudio",			n_SendAudio },
+	{ "SendChatAction",		n_SendChatAction},
+	{ "ForwardMessage",		n_ForwardMessage },
+
 	{ "SetOwner",			n_SetOwner }
 };
 int amx_TelegramPawnInit(AMX* amx)
@@ -372,6 +474,19 @@ void console_Thread()
 	}
 	exit(0);
 }
+void replaceAll(std::string& data, const std::string& toSearch, const std::string& replaceStr)
+{
+	// Get the first occurrence
+	size_t pos = data.find(toSearch);
+	// Repeat till end is reached
+	while (pos != std::string::npos)
+	{
+		// Replace this occurrence of Sub String
+		data.replace(pos, toSearch.size(), replaceStr);
+		// Get the next occurrence from the current position
+		pos = data.find(toSearch, pos + replaceStr.size());
+	}
+}
 void LoadLogFile();
 int main()
 {
@@ -396,6 +511,8 @@ int main()
 	LoadScript((char*)script.c_str());
 	
 	bot.getEvents().onAnyMessage([&bot](TgBot::Message::Ptr message) {
+		//replaceAll(message->text, "%", "%%");
+		//replaceAll(message->caption, "%", "%%");
 		if (!message->text.empty())
 		{
 			if (StringTools::startsWith(message->text, "/"))
@@ -520,6 +637,8 @@ int main()
 		}
 	});
 	bot.getEvents().onUnknownCommand([&bot](TgBot::Message::Ptr message) {
+		//replaceAll(message->text, "%", "%%");
+		//replaceAll(message->caption, "%", "%%");
 		int idx;
 		cell ret = 1;	// DEFAULT TO 1!
 		if (message->text.length() < 120)

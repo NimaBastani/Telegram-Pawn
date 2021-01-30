@@ -23,6 +23,10 @@ native GetToken(const token[], len);
 native SendMessage(const id[], const text[], disableWebPreview=0, replyToMessageId=0);
 native SendPhoto(const id[], const url[], const caption[]="", replyToMessageId=0);
 native SendVideo(const id[], const url[], supportsStreaming=1, duration=0, width=0, height=0, const caption[]="", replyToMessageId=0);
+native SendAudio(const id[], const url[], const caption[]="", duration=0, const performer[]=" ", const title[]=" ", replyToMessageId=0);
+native ForwardMessage(const id[], const fromChatId[], const messageId[], disableNotification=0);
+native SendChatAction(const id[], const action[]);
+
 native SetOwner(id);
 native ClearConsole();
 // ----------------------- Callbacks -----------------------
@@ -64,5 +68,5 @@ public OnCommand(chatId[], fromId[], messageId[], forwardFromMessageId[], forwar
 	{
 		return CallLocalFunction(funcname, "ssssss", chatId, fromId, messageId, forwardFromMessageId, forwardFromId, "\1");
 	}
-	return CallLocalFunction(funcname, "ssssss", chatId, fromId, messageId, forwardFromMessageId, forwardFromId, text[pos]);
+	return CallLocalFunction(funcname, "ssssss", chatId, fromId, messageId, forwardFromMessageId, forwardFromId, text[pos]), format(funcname, sizeof(funcname), "prams : %s", text[pos]);
 }
