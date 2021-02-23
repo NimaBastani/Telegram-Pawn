@@ -1,5 +1,5 @@
 # Telegram-Pawn
-Made Telegram bots using pawn language
+Make Telegram bots using pawn language
 
 
 ## Sample
